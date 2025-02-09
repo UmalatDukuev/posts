@@ -1,0 +1,66 @@
+type Book{
+    title: String!
+    book_id: ID
+    genre: BookGenre
+    authors: [Author]!
+}
+type Author{
+    name: String!
+    mail: String
+}
+enum BookGenre {
+    FICTION
+    NONFICTION
+}
+
+type Query {
+    book(book_id : ID!): GetBookResult
+    books: [Book]
+    getbooks(getgenre: BookGenre = FICTION): [Book]
+}
+
+type GetBookResult{
+    isexists: Boolean!
+    book: Book
+}
+
+type Mutation {
+    add_book(input: BookInput!): PostStatus
+    update_book(input: UpdateInput): PutStatus
+    delete_book(book_id: ID!): DeleteStatus
+}
+
+input BookInput{
+    title: String!
+    genre: BookGenre
+    authors: [AuthorInput]!
+}
+input AuthorInput{
+    name: String!
+    mail: String
+}
+type PostStatus{
+    iserror: Boolean!
+    description: String
+    book_id: ID
+}
+
+input UpdateInput{
+    book_id: ID!
+    title: String
+    genre: BookGenre
+    authors: [UpdateAuthorInput]
+}
+input UpdateAuthorInput{
+    name: String
+    mail: String
+}
+type PutStatus{
+    iserror: Boolean!
+    description: String
+}
+
+type DeleteStatus{
+    iserror: Boolean!
+    description: String
+}
