@@ -7,52 +7,72 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 	"posts/graph/model"
+	"posts/utils"
+	"time"
 )
 
-// CreatePost is the resolver for the createPost field.
-func (r *mutationResolver) CreatePost(ctx context.Context, input model.CreatePostInput) (*model.PostStatus, error) {
-	panic(fmt.Errorf("not implemented: CreatePost - createPost"))
+func (r *mutationResolver) CreatePost(ctx context.Context, input model.NewPost) (*model.Post, error) {
+	log.Println("Создание нового поста...")
+
+	post := &model.Post{
+		Title:       input.Title,
+		Content:     input.Content,
+		Author:      utils.GetStringValue(input.Author),
+		PublishedAt: utils.GetStringValue(input.PublishedAt),
+		// UpdatedAt:       "utils.GetStringValue(input.UpdatedAt)",
+		Comments:        []*model.Comment{},
+		CommentsAllowed: true,
+	}
+
+	if post.PublishedAt == "" {
+		post.PublishedAt = time.Now().Format(time.RFC3339)
+	}
+
+	if err := r.Database.Create(post).Error; err != nil {
+		log.Printf("Ошибка при создании поста: %v", err)
+		return nil, err
+	}
+
+	log.Printf("Пост успешно создан: %+v", post)
+	return post, nil
 }
 
 // UpdatePost is the resolver for the updatePost field.
-func (r *mutationResolver) UpdatePost(ctx context.Context, id string, allowComments *bool) (*model.PostStatus, error) {
-	panic(fmt.Errorf("not implemented: UpdatePost - updatePost"))
+func (r *mutationResolver) UpdatePost(ctx context.Context, postID int32, input *model.NewPost) (*model.Post, error) {
+	var post model.Post
+
+	return &post, nil
 }
 
-// DeletePost is the resolver for the deletePost field.
-func (r *mutationResolver) DeletePost(ctx context.Context, id string) (*model.DeleteStatus, error) {
-	panic(fmt.Errorf("not implemented: DeletePost - deletePost"))
+// CreateComment is the resolver for the CreateComment field.
+func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewComment) (*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: CreateComment - CreateComment"))
 }
 
-// AddComment is the resolver for the addComment field.
-func (r *mutationResolver) AddComment(ctx context.Context, input model.CreateCommentInput) (*model.CommentStatus, error) {
-	panic(fmt.Errorf("not implemented: AddComment - addComment"))
+// GetAllPosts is the resolver for the GetAllPosts field.
+func (r *queryResolver) GetAllPosts(ctx context.Context) ([]*model.Post, error) {
+	var posts []*model.Post
+
+	return posts, nil
 }
 
-// DeleteComment is the resolver for the deleteComment field.
-func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (*model.DeleteStatus, error) {
-	panic(fmt.Errorf("not implemented: DeleteComment - deleteComment"))
+// GetOnePost is the resolver for the GetOnePost field.
+func (r *queryResolver) GetOnePost(ctx context.Context, id int32) (*model.Post, error) {
+	var post model.Post
+
+	return &post, nil
 }
 
-// Posts is the resolver for the posts field.
-func (r *queryResolver) Posts(ctx context.Context, limit *int32, offset *int32) ([]*model.Post, error) {
-	panic(fmt.Errorf("not implemented: Posts - posts"))
+// GetCommentsByPost is the resolver for the GetCommentsByPost field.
+func (r *queryResolver) GetCommentsByPost(ctx context.Context, postID int32, limit *int32, offset *int32) ([]*model.Comment, error) {
+	panic(fmt.Errorf("not implemented: GetCommentsByPost - GetCommentsByPost"))
 }
 
-// Post is the resolver for the post field.
-func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented: Post - post"))
-}
-
-// Comments is the resolver for the comments field.
-func (r *queryResolver) Comments(ctx context.Context, postID string, limit *int32, offset *int32) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: Comments - comments"))
-}
-
-// CommentAdded is the resolver for the commentAdded field.
-func (r *subscriptionResolver) CommentAdded(ctx context.Context, postID string) (<-chan *model.Comment, error) {
-	panic(fmt.Errorf("not implemented: CommentAdded - commentAdded"))
+// NewCommentAdded is the resolver for the NewCommentAdded field.
+func (r *subscriptionResolver) NewCommentAdded(ctx context.Context, postID int32) (<-chan *model.Comment, error) {
+	panic(fmt.Errorf("not implemented: NewCommentAdded - NewCommentAdded"))
 }
 
 // Mutation returns MutationResolver implementation.

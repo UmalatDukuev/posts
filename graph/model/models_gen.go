@@ -3,66 +3,46 @@
 package model
 
 type Comment struct {
-	ID              string     `json:"id"`
-	Content         string     `json:"content"`
-	Author          *User      `json:"author"`
-	PostID          string     `json:"postId"`
-	ParentCommentID *string    `json:"parentCommentId,omitempty"`
-	CreatedAt       string     `json:"createdAt"`
-	Replies         []*Comment `json:"replies,omitempty"`
-}
-
-type CommentStatus struct {
-	IsError bool     `json:"isError"`
-	Message *string  `json:"message,omitempty"`
-	Comment *Comment `json:"comment,omitempty"`
-}
-
-type CreateCommentInput struct {
-	Content         string  `json:"content"`
-	AuthorID        string  `json:"authorId"`
-	PostID          string  `json:"postId"`
-	ParentCommentID *string `json:"parentCommentId,omitempty"`
-}
-
-type CreatePostInput struct {
-	Title         string `json:"title"`
-	Content       string `json:"content"`
-	AuthorID      string `json:"authorId"`
-	AllowComments bool   `json:"allowComments"`
-}
-
-type DeleteStatus struct {
-	IsError bool    `json:"isError"`
-	Message *string `json:"message,omitempty"`
+	ID        int32   `json:"id"`
+	PostID    int32   `json:"PostId"`
+	Author    string  `json:"Author"`
+	Content   string  `json:"Content"`
+	ParentID  *int32  `json:"ParentId,omitempty"`
+	CreatedAt string  `json:"Created_At"`
+	UpdatedAt *string `json:"Updated_At,omitempty"`
 }
 
 type Mutation struct {
 }
 
-type Post struct {
-	ID            string     `json:"id"`
-	Title         string     `json:"title"`
-	Content       string     `json:"content"`
-	AuthorID      string     `json:"authorId"`
-	AllowComments bool       `json:"allowComments"`
-	Comments      []*Comment `json:"comments,omitempty"`
+type NewComment struct {
+	PostID   int32  `json:"PostId"`
+	Author   string `json:"Author"`
+	Content  string `json:"Content"`
+	ParentID *int32 `json:"ParentId,omitempty"`
 }
 
-type PostStatus struct {
-	IsError bool    `json:"isError"`
-	Message *string `json:"message,omitempty"`
-	Post    *Post   `json:"post,omitempty"`
+type NewPost struct {
+	Title       string  `json:"Title"`
+	Content     string  `json:"Content"`
+	Author      *string `json:"Author,omitempty"`
+	PublishedAt *string `json:"Published_At,omitempty"`
+	UpdatedAt   *string `json:"Updated_At,omitempty"`
+}
+
+type Post struct {
+	ID              int32      `json:"id"`
+	Title           string     `json:"Title"`
+	Content         string     `json:"Content"`
+	Author          string     `json:"Author"`
+	PublishedAt     string     `json:"Published_At"`
+	UpdatedAt       *string    `json:"Updated_At,omitempty"`
+	Comments        []*Comment `json:"Comments"`
+	CommentsAllowed bool       `json:"Comments_Allowed"`
 }
 
 type Query struct {
 }
 
 type Subscription struct {
-}
-
-type User struct {
-	ID       string  `json:"id"`
-	Username string  `json:"username"`
-	Email    *string `json:"email,omitempty"`
 }

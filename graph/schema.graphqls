@@ -1,74 +1,54 @@
-type User {
-    id: ID!
-    username: String!
-    email: String
-}
-
 type Post {
-    id: ID!
-    title: String!
-    content: String!
-    authorId: ID!
-    allowComments: Boolean!
-    comments(limit: Int = 10, offset: Int = 0): [Comment]
-}
-
-type Comment {
-    id: ID!
-    content: String!
-    author: User!
-    postId: ID!
-    parentCommentId: ID
-    createdAt: String!
-    replies(limit: Int = 10, offset: Int = 0): [Comment]
+  id: Int!
+  Title: String!
+  Content: String!
+  Author: String!
+  Published_At: String!
+  Updated_At: String
+  Comments: [Comment!]!
+  Comments_Allowed: Boolean!
 }
 
 type Query {
-    posts(limit: Int = 10, offset: Int = 0): [Post]
-    post(id: ID!): Post
-    comments(postId: ID!, limit: Int = 10, offset: Int = 0): [Comment]
+  GetAllPosts: [Post!]!
+  GetOnePost(id: Int!): Post!
+  GetCommentsByPost(postId: Int!, limit: Int, offset: Int): [Comment!]!
 }
 
-input CreatePostInput {
-    title: String!
-    content: String!
-    authorId: ID!
-    allowComments: Boolean!
+ 
+input NewPost {
+  Title: String!
+  Content: String!
+  Author: String
+  Published_At: String
+  Updated_At: String
 }
-
-input CreateCommentInput {
-    content: String!
-    authorId: ID!
-    postId: ID!
-    parentCommentId: ID
-}
-
+ 
 type Mutation {
-    createPost(input: CreatePostInput!): PostStatus
-    updatePost(id: ID!, allowComments: Boolean): PostStatus 
-    deletePost(id: ID!): DeleteStatus
-
-    addComment(input: CreateCommentInput!): CommentStatus
-    deleteComment(id: ID!): DeleteStatus
+  CreatePost(input: NewPost!): Post!
+  UpdatePost(PostId: Int!, input: NewPost): Post!
+  CreateComment(input: NewComment!): Comment!
 }
 
-type PostStatus {
-    isError: Boolean!
-    message: String
-    post: Post
+type Comment {
+  id: Int!
+  PostId: Int!
+  Author: String!
+  Content: String!
+  ParentId: Int
+  Created_At: String!
+  Updated_At: String
 }
 
-type CommentStatus {
-    isError: Boolean!
-    message: String
-    comment: Comment
+input NewComment {
+  PostId: Int!
+  Author: String!
+  Content: String!
+  ParentId: Int 
 }
 
-type DeleteStatus {
-    isError: Boolean!
-    message: String
-}
 
 type Subscription {
-    commentAdded(postId: ID!): Comment
+  NewCommentAdded(postId: Int!): Comment!
 }
+
