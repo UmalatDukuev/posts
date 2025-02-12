@@ -21,7 +21,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input model.NewPost) 
 		Content:     input.Content,
 		Author:      utils.GetStringValue(input.Author),
 		PublishedAt: utils.GetStringValue(input.PublishedAt),
-		// UpdatedAt:       "utils.GetStringValue(input.UpdatedAt)",
+		// UpdatedAt:       utils.GetStringValue(input.UpdatedAt), //"utils.GetStringValue(input.UpdatedAt)",
 		Comments:        []*model.Comment{},
 		CommentsAllowed: true,
 	}
@@ -39,35 +39,106 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input model.NewPost) 
 	return post, nil
 }
 
-// UpdatePost is the resolver for the updatePost field.
 func (r *mutationResolver) UpdatePost(ctx context.Context, postID int32, input *model.NewPost) (*model.Post, error) {
-	var post model.Post
+	log.Printf("Обновление поста с ID: %d", postID)
 
+	var post model.Post
+	if err := r.Database.First(&post, postID).Error; err != nil {
+		log.Printf("Ошибка при поиске поста: %v", err)
+		return nil, err
+	}
+
+	if input.Title != "" {
+		post.Title = input.Title
+	}
+	if input.Content != "" {
+		post.Content = input.Content
+	}
+	if input.Author != nil {
+		post.Author = *input.Author
+	}
+	updatedAt := time.Now().Format(time.RFC3339)
+	post.UpdatedAt = &updatedAt
+
+	if err := r.Database.Save(&post).Error; err != nil {
+		log.Printf("Ошибка при обновлении поста: %v", err)
+		return nil, err
+	}
+
+	log.Printf("Пост успешно обновлен: %+v", post)
 	return &post, nil
 }
 
-// CreateComment is the resolver for the CreateComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewComment) (*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: CreateComment - CreateComment"))
+	log.Println("Создание нового комментария...")
+
+	if len(input.Content) > 2000 {
+		return nil, fmt.Errorf("длина комментария превышает 2000 символов")
+	}
+
+	comment := &model.Comment{
+		PostID:    input.PostID,
+		Author:    input.Author,
+		Content:   input.Content,
+		ParentID:  input.ParentID,
+		CreatedAt: time.Now().Format(time.RFC3339),
+	}
+
+	if err := r.Database.Create(comment).Error; err != nil {
+		log.Printf("Ошибка при создании комментария: %v", err)
+		return nil, err
+	}
+
+	log.Printf("Комментарий успешно создан: %+v", comment)
+	return comment, nil
 }
 
-// GetAllPosts is the resolver for the GetAllPosts field.
 func (r *queryResolver) GetAllPosts(ctx context.Context) ([]*model.Post, error) {
-	var posts []*model.Post
+	log.Println("Получение всех постов...")
 
+	var posts []*model.Post
+	if err := r.Database.Find(&posts).Error; err != nil {
+		log.Printf("Ошибка при получении постов: %v", err)
+		return nil, err
+	}
+
+	log.Printf("Найдено %d постов", len(posts))
 	return posts, nil
 }
 
-// GetOnePost is the resolver for the GetOnePost field.
 func (r *queryResolver) GetOnePost(ctx context.Context, id int32) (*model.Post, error) {
-	var post model.Post
+	log.Printf("Получение поста с ID: %d", id)
 
+	var post model.Post
+	if err := r.Database.First(&post, id).Error; err != nil {
+		log.Printf("Ошибка при получении поста: %v", err)
+		return nil, err
+	}
+
+	log.Printf("Пост найден: %+v", post)
 	return &post, nil
 }
 
-// GetCommentsByPost is the resolver for the GetCommentsByPost field.
 func (r *queryResolver) GetCommentsByPost(ctx context.Context, postID int32, limit *int32, offset *int32) ([]*model.Comment, error) {
-	panic(fmt.Errorf("not implemented: GetCommentsByPost - GetCommentsByPost"))
+	log.Printf("Получение комментариев для поста ID: %d", postID)
+
+	var comments []*model.Comment
+	query := r.Database.Where("post_id = ?", postID)
+
+	if limit != nil {
+		query = query.Limit(int(*limit))
+	}
+	if offset != nil {
+		query = query.Offset(int(*offset))
+	}
+
+	if err := query.Find(&comments).Error; err != nil {
+		log.Printf("Ошибка при получении комментариев: %v", err)
+		return nil, err
+	}
+
+	log.Printf("Найдено %d комментариев", len(comments))
+	return comments, nil
 }
 
 // NewCommentAdded is the resolver for the NewCommentAdded field.

@@ -31,6 +31,7 @@ func CreateDB() {
 }
 
 func MigrateDB() {
-	DBInstance.AutoMigrate(&dbmodel.Post{})
+
+	DBInstance.AutoMigrate(&dbmodel.Post{}, &dbmodel.Comment{})
 	fmt.Println("Database migration completed....")
 }
