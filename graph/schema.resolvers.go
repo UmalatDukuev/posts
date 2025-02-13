@@ -76,6 +76,17 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewCom
 		return nil, fmt.Errorf("длина комментария превышает 2000 символов")
 	}
 
+	var post model.Post
+	if err := r.Database.First(&post, input.PostID).Error; err != nil {
+		log.Printf("Ошибка при получении поста: %v", err)
+		return nil, fmt.Errorf("пост с ID %d не найден", input.PostID)
+	}
+
+	if !post.CommentsAllowed {
+		log.Printf("Комментарии к посту с ID %d запрещены", input.PostID)
+		return nil, fmt.Errorf("комментарии к этому посту отключены")
+	}
+
 	comment := &model.Comment{
 		PostID:    input.PostID,
 		Author:    input.Author,
