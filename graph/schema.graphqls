@@ -22,6 +22,7 @@ input NewPost {
   Author: String
   Published_At: String
   Updated_At: String
+  Comments_Allowed: Boolean!
 }
  
 type Mutation {

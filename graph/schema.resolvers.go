@@ -13,6 +13,7 @@ import (
 	"time"
 )
 
+// CreatePost is the resolver for the CreatePost field.
 func (r *mutationResolver) CreatePost(ctx context.Context, input model.NewPost) (*model.Post, error) {
 	log.Println("Создание нового поста...")
 
@@ -39,6 +40,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input model.NewPost) 
 	return post, nil
 }
 
+// UpdatePost is the resolver for the UpdatePost field.
 func (r *mutationResolver) UpdatePost(ctx context.Context, postID int32, input *model.NewPost) (*model.Post, error) {
 	log.Printf("Обновление поста с ID: %d", postID)
 
@@ -69,6 +71,7 @@ func (r *mutationResolver) UpdatePost(ctx context.Context, postID int32, input *
 	return &post, nil
 }
 
+// CreateComment is the resolver for the CreateComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewComment) (*model.Comment, error) {
 	log.Println("Создание нового комментария...")
 
@@ -104,6 +107,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.NewCom
 	return comment, nil
 }
 
+// GetAllPosts is the resolver for the GetAllPosts field.
 func (r *queryResolver) GetAllPosts(ctx context.Context) ([]*model.Post, error) {
 	log.Println("Получение всех постов...")
 
@@ -117,6 +121,7 @@ func (r *queryResolver) GetAllPosts(ctx context.Context) ([]*model.Post, error) 
 	return posts, nil
 }
 
+// GetOnePost is the resolver for the GetOnePost field.
 func (r *queryResolver) GetOnePost(ctx context.Context, id int32) (*model.Post, error) {
 	log.Printf("Получение поста с ID: %d", id)
 
@@ -130,6 +135,7 @@ func (r *queryResolver) GetOnePost(ctx context.Context, id int32) (*model.Post, 
 	return &post, nil
 }
 
+// GetCommentsByPost is the resolver for the GetCommentsByPost field.
 func (r *queryResolver) GetCommentsByPost(ctx context.Context, postID int32, limit *int32, offset *int32) ([]*model.Comment, error) {
 	log.Printf("Получение комментариев для поста ID: %d", postID)
 

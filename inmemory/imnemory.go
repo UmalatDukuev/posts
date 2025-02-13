@@ -1,7 +1,6 @@
 package inmemory
 
 import (
-	"fmt"
 	"posts/dbmodel"
 	"sync"
 	"time"
@@ -30,19 +29,14 @@ func (db *InMemoryDB) CreatePost(post *dbmodel.Post) {
 	post.ID = db.nextPostID
 	db.nextPostID++
 	post.PublishedAt = time.Now()
+	post.CommentsAllowed = true
 	db.posts[post.ID] = *post
 }
 
 func (db *InMemoryDB) GetAllPosts() []dbmodel.Post {
-	fmt.Println(1111111111111111)
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	posts := []dbmodel.Post{}
-
-	if len(db.posts) == 0 {
-		fmt.Println(1111111111111111)
-		return posts
-	}
+	posts := make([]dbmodel.Post, 0, len(db.posts))
 	for _, post := range db.posts {
 		posts = append(posts, post)
 	}
@@ -56,13 +50,44 @@ func (db *InMemoryDB) GetOnePost(id int32) (dbmodel.Post, bool) {
 	return post, exists
 }
 
-func (db *InMemoryDB) CreateComment(comment *dbmodel.Comment) {
+func (db *InMemoryDB) UpdatePost(id int32, updatedPost dbmodel.Post) bool {
 	db.mu.Lock()
 	defer db.mu.Unlock()
+	post, exists := db.posts[id]
+	if !exists {
+		return false
+	}
+	if updatedPost.Title != "" {
+		post.Title = updatedPost.Title
+	}
+	if updatedPost.Content != "" {
+		post.Content = updatedPost.Content
+	}
+	if updatedPost.Author != "" {
+		post.Author = updatedPost.Author
+	}
+	if updatedPost.UpdatedAt != nil {
+		post.UpdatedAt = updatedPost.UpdatedAt
+	}
+	if updatedPost.CommentsAllowed != post.CommentsAllowed {
+		post.CommentsAllowed = updatedPost.CommentsAllowed
+	}
+	db.posts[id] = post
+	return true
+}
+
+func (db *InMemoryDB) CreateComment(comment *dbmodel.Comment) bool {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+	post, exists := db.posts[comment.PostID]
+	if !exists || !post.CommentsAllowed {
+		return false
+	}
 	comment.ID = db.nextCommentID
 	db.nextCommentID++
 	comment.CreatedAt = time.Now()
 	db.comments[comment.PostID] = append(db.comments[comment.PostID], *comment)
+	return true
 }
 
 func (db *InMemoryDB) GetCommentsByPost(postID int32) []dbmodel.Comment {

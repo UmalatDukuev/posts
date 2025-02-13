@@ -4074,7 +4074,7 @@ func (ec *executionContext) unmarshalInputNewPost(ctx context.Context, obj any) 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"Title", "Content", "Author", "Published_At", "Updated_At"}
+	fieldsInOrder := [...]string{"Title", "Content", "Author", "Published_At", "Updated_At", "Comments_Allowed"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4116,6 +4116,13 @@ func (ec *executionContext) unmarshalInputNewPost(ctx context.Context, obj any) 
 				return it, err
 			}
 			it.UpdatedAt = data
+		case "Comments_Allowed":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Comments_Allowed"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsAllowed = data
 		}
 	}
 

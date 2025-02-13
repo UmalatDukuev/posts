@@ -23,11 +23,12 @@ type NewComment struct {
 }
 
 type NewPost struct {
-	Title       string  `json:"Title"`
-	Content     string  `json:"Content"`
-	Author      *string `json:"Author,omitempty"`
-	PublishedAt *string `json:"Published_At,omitempty"`
-	UpdatedAt   *string `json:"Updated_At,omitempty"`
+	Title           string  `json:"Title"`
+	Content         string  `json:"Content"`
+	Author          *string `json:"Author,omitempty"`
+	PublishedAt     *string `json:"Published_At,omitempty"`
+	UpdatedAt       *string `json:"Updated_At,omitempty"`
+	CommentsAllowed bool    `json:"Comments_Allowed"`
 }
 
 type Post struct {
